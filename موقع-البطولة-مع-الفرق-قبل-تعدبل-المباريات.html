@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول بطولة الموظفين وفرق العمل</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; background-color: #eff6ff; }
+        .tab-inactive { border-bottom: 2px solid transparent; color: #6b7280; }
+        .tab-inactive:hover { color: #374151; background-color: #f9fafb; }
+    </style>
+
+    <!-- React & ReactDOM (UMD) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { createRoot } = ReactDOM;
+
+        // --- Icons ---
+        const IconBase = ({ size = 20, className = "", children }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+        );
+        const Users = (props) => <IconBase {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
+        const Shirt = (props) => <IconBase {...props}><path d="M20.38 3.4a2 2 0 0 0-1.2-1.28l-3.11-1a2 2 0 0 0-2.16.67l-.87 1.08a2 2 0 0 1-3.08 0l-.87-1.08a2 2 0 0 0-2.15-.67l-3.12 1a2 2 0 0 0-1.2 1.28l.63 3.12a2 2 0 0 1-.22 1.63l-2.06 3.55a2 2 0 0 0 .83 2.85l1.62.92a2 2 0 0 1 1.03 1.74v5.36a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-5.36a2 2 0 0 1 1.03-1.74l1.62-.92a2 2 0 0 0 .83-2.85l-2.06-3.55a2 2 0 0 1-.22-1.63z"/></IconBase>;
+        const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
+        const Calendar = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
+        const Trophy = (props) => <IconBase {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></IconBase>;
+        const Phone = (props) => <IconBase {...props}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></IconBase>;
+        const Briefcase = (props) => <IconBase {...props}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></IconBase>;
+        const Clock = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></IconBase>;
+        const Shield = (props) => <IconBase {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></IconBase>;
+
+
+        // --- Raw Data from CSV ---
+        // تم استخراج كافة البيانات المتاحة من الملف المرفق
+        const RAW_ROSTER_DATA = [
+  {
+    "name": "عبدالمحسن",
+    "region": "CRO",
+    "phone": "544733029",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Hazim Alzaydani",
+    "region": "CRO",
+    "phone": "509426720",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "ZainKurdi",
+    "region": "WRO",
+    "phone": "568696099",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "amr abd elkader",
+    "region": "CRO",
+    "phone": "564987039",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Abdelrahman Ali",
+    "region": "CRO",
+    "phone": "543637260",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Muhammed Balabel",
+    "region": "WRO",
+    "phone": "534082117",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "Ahmed nagy",
+    "region": "WRO",
+    "phone": "509142610",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "خالد العامري",
+    "region": "CRO",
+    "phone": "594442447",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "أنس محمد",
+    "region": "ERO",
+    "phone": "545386660",
+    "sector": "Health",
+    "team": "E-1"
+  },
+  {
+    "name": "عبدالرحمن",
+    "region": "CRO",
+    "phone": "556002828",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Mohammed Almarwany",
+    "region": "WRO",
+    "phone": "551091955",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "Saad Abdulaziz Alolayan",
+    "region": "CRO",
+    "phone": "551118422",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Abdulrahman Mohammed Alshahrani",
+    "region": "CRO",
+    "phone": "547000852",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Hazim Alzaydani",
+    "region": "CRO",
+    "phone": "509426720",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Hazem Lababidi",
+    "region": "CRO",
+    "phone": "503667592",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "FAHAD ALDOHEIMAN",
+    "region": "CRO",
+    "phone": "556003432",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "Ibrahim Almalki",
+    "region": "CRO",
+    "phone": "546536186",
+    "sector": "Health",
+    "team": "C-1"
+  },
+  {
+    "name": "هاجد العتيبي",
+    "region": "CRO",
+    "phone": "545307574",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Yahya Mashta",
+    "region": "CRO",
+    "phone": "593614058",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Ziyad Alqhtani",
+    "region": "CRO",
+    "phone": "550896765",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "MAJED  ALJUHANI",
+    "region": "WRO",
+    "phone": "549333660",
+    "sector": "Finance",
+    "team": "W-1"
+  },
+  {
+    "name": "رعد ابوزيد الغماس",
+    "region": "CRO",
+    "phone": "566412490",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Zain Kurdi",
+    "region": "WRO",
+    "phone": "568696099",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "AHMED IBRAHIM SHATLA",
+    "region": "WRO",
+    "phone": "547634836",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "Omar Shakir",
+    "region": "WRO",
+    "phone": "561828452",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "Mshari Al-Zaid",
+    "region": "CRO",
+    "phone": "503022993",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Ayman Aldeheilb",
+    "region": "ERO",
+    "phone": "566607798",
+    "sector": "Health",
+    "team": "E-2"
+  },
+  {
+    "name": "faisal alsultan",
+    "region": "CRO",
+    "phone": "549306130",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Ali Hassan Almehdhar",
+    "region": "CRO",
+    "phone": "548187119",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "زياد احمد القاسم",
+    "region": "CRO",
+    "phone": "599545200",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Abdulrahman",
+    "region": "CRO",
+    "phone": "592678888",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Naif Nasser Alessa",
+    "region": "CRO",
+    "phone": "966539111779",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Sami Al Alyani",
+    "region": "CRO",
+    "phone": "502319646",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "عبدالله سلطان المالكي",
+    "region": "CRO",
+    "phone": "532280357",
+    "sector": "Customer Service and Marketing",
+    "team": "C-10"
+  },
+  {
+    "name": "Gauthier Dupre",
+    "region": "CRO",
+    "phone": "503303685",
+    "sector": "Corporate Development",
+    "team": "C-11"
+  },
+  {
+    "name": "Faisal Haroon",
+    "region": "CRO",
+    "phone": "543265166",
+    "sector": "Human Resources",
+    "team": "C-11"
+  },
+  {
+    "name": "Abdulaziz Alfayez",
+    "region": "CRO",
+    "phone": "535351955",
+    "sector": "Finance",
+    "team": "C-11"
+  },
+  {
+    "name": "Ali Almohanna",
+    "region": "ERO",
+    "phone": "566596111",
+    "sector": "Health",
+    "team": "E-1"
+  },
+  {
+    "name": "Ibrahim Alharbi",
+    "region": "CRO",
+    "phone": "550883755",
+    "sector": "Investment",
+    "team": "C-11"
+  },
+  {
+    "name": "Malik ALshareef",
+    "region": "WRO",
+    "phone": "598244637",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "Majed Bawazir",
+    "region": "CRO",
+    "phone": "544797636",
+    "sector": "Governance",
+    "team": "C-11"
+  },
+  {
+    "name": "mohammed abdulati",
+    "region": "WRO",
+    "phone": "966560737672",
+    "sector": "Health",
+    "team": "W-1"
+  },
+  {
+    "name": "Mohammed Barri",
+    "region": "WRO",
+    "phone": "544340611",
+    "sector": "Customer Service and Marketing",
+    "team": "W-1"
+  },
+  {
+    "name": "qasem Radwan Abuharbah",
+    "region": "WRO",
+    "phone": "565566875",
+    "sector": "Finance",
+    "team": "W-2"
+  },
+  {
+    "name": "Waleed Alomair",
+    "region": "CRO",
+    "phone": "536655550",
+    "sector": "Strategy",
+    "team": "C-11"
+  },
+  {
+    "name": "عبدالرحمن العساف",
+    "region": "CRO",
+    "phone": "504302869",
+    "sector": "CEO",
+    "team": "C-11"
+  },
+  {
+    "name": "Nasser",
+    "region": "CRO",
+    "phone": "566997090",
+    "sector": "Corporate Excellence - Customer Experience",
+    "team": "C-11"
+  },
+  {
+    "name": "Ali",
+    "region": "CRO",
+    "phone": "561112393",
+    "sector": "Technology and Digital",
+    "team": "C-11"
+  },
+  {
+    "name": "Bader Alotaibi",
+    "region": "CRO",
+    "phone": "555276958",
+    "sector": "Life",
+    "team": "C-11"
+  },
+  {
+    "name": "majed khalid alharbi",
+    "region": "CRO",
+    "phone": "541065738",
+    "sector": "Health",
+    "team": "C-11"
+  },
+  {
+    "name": "Mohammed Alali",
+    "region": "ERO",
+    "phone": "593600111",
+    "sector": "Health",
+    "team": "E-2"
+  },
+  {
+    "name": "Ahmed Abdulmoteleb",
+    "region": "CRO",
+    "phone": "565436986",
+    "sector": "Human Resources",
+    "team": "C-12"
+  },
+  {
+    "name": "Moataz Alsafi",
+    "region": "CRO",
+    "phone": "530604341",
+    "sector": "Governance",
+    "team": "C-12"
+  },
+  {
+    "name": "Yazeed Alhudaithi",
+    "region": "CRO",
+    "phone": "551116922",
+    "sector": "Finance",
+    "team": "C-12"
+  },
+  {
+    "name": "Sarfraz Khan",
+    "region": "CRO",
+    "phone": "504697827",
+    "sector": "Technology and Digital",
+    "team": "C-12"
+  },
+  {
+    "name": "Faisal Zafar",
+    "region": "CRO",
+    "phone": "546878978",
+    "sector": "Strategy",
+    "team": "C-12"
+  },
+  {
+    "name": "مصعب عبدالرحمن باقازي",
+    "region": "CRO",
+    "phone": "540930188",
+    "sector": "Customer Service and Marketing",
+    "team": "C-12"
+  },
+  {
+    "name": "nawaf mohammed alamri",
+    "region": "CRO",
+    "phone": "508420547",
+    "sector": "Customer Service and Marketing",
+    "team": "C-12"
+  },
+  {
+    "name": "Fahad Alanazi",
+    "region": "CRO",
+    "phone": "533939326",
+    "sector": "CEO",
+    "team": "C-12"
+  },
+  {
+    "name": "Faisal Albaqami",
+    "region": "CRO",
+    "phone": "503853953",
+    "sector": "Life",
+    "team": "C-12"
+  },
+  {
+    "name": "bader tawfiq",
+    "region": "CRO",
+    "phone": "55417174",
+    "sector": "Health",
+    "team": "C-12"
+  },
+  {
+    "name": "محمد ابوحيمد",
+    "region": "CRO",
+    "phone": "566003775",
+    "sector": "Health",
+    "team": "C-12"
+  },
+  {
+    "name": "Abdulwhab Thobali",
+    "region": "CRO",
+    "phone": "542847944",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "أحمد محمد السحيمي",
+    "region": "CRO",
+    "phone": "543070219",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "Saeed Alqahtani",
+    "region": "ERO",
+    "phone": "561816104",
+    "sector": "Health",
+    "team": "E-1"
+  },
+  {
+    "name": "ABDULLAH SAIDAN",
+    "region": "CRO",
+    "phone": "503013111",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "احمد محمد شاكر اغا",
+    "region": "CRO",
+    "phone": "546982257",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "Mohammed Aldadjan",
+    "region": "CRO",
+    "phone": "536134684",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "Abdulaziz Hamade",
+    "region": "CRO",
+    "phone": "550315988",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "Ahmad Alsaeed",
+    "region": "CRO",
+    "phone": "564984500",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "Abdullah Albisi",
+    "region": "CRO",
+    "phone": "503998406",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "YAZEED Aldajani",
+    "region": "CRO",
+    "phone": "545155573",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "عبدالمحسن",
+    "region": "CRO",
+    "phone": "544733029",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "محمد معروف",
+    "region": "WRO",
+    "phone": "504372225",
+    "sector": "Health",
+    "team": "W-2"
+  },
+  {
+    "name": "Essam Mohamed Ahmed",
+    "region": "ERO",
+    "phone": "561964996",
+    "sector": "Health",
+    "team": "E-2"
+  },
+  {
+    "name": "Faisal Alabdan",
+    "region": "CRO",
+    "phone": "596008168",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "Ahmed Tolba",
+    "region": "CRO",
+    "phone": "502653162",
+    "sector": "Health",
+    "team": "C-2"
+  },
+  {
+    "name": "Ahmed AlIsmail",
+    "region": "CRO",
+    "phone": "532167392",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "محمد القطان",
+    "region": "WRO",
+    "phone": "563331813",
+    "sector": "Health",
+    "team": "W-2"
+  },
+  {
+    "name": "Abdulrahman",
+    "region": "WRO",
+    "phone": "569622567",
+    "sector": "Health",
+    "team": "W-2"
+  },
+  {
+    "name": "معاذ السليمان",
+    "region": "CRO",
+    "phone": "502103260",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Ahmed Hattan",
+    "region": "WRO",
+    "phone": "582277169",
+    "sector": "Customer Service and Marketing",
+    "team": "W-2"
+  },
+  {
+    "name": "Reda Darwish",
+    "region": "WRO",
+    "phone": "543589371",
+    "sector": "Health",
+    "team": "W-2"
+  },
+  {
+    "name": "Omar Alanazi",
+    "region": "CRO",
+    "phone": "534608952",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Ahmed Mohammed",
+    "region": "CRO",
+    "phone": "540650095",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Ahmed Shamsuldin",
+    "region": "CRO",
+    "phone": "551260043",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Mohamad shahber",
+    "region": "WRO",
+    "phone": "563680293",
+    "sector": "Finance",
+    "team": "W-2"
+  },
+  {
+    "name": "Amr Adel Khalil",
+    "region": "CRO",
+    "phone": "560690382",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Mohammed Alabdi",
+    "region": "CRO",
+    "phone": "554104448",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "علاء عمران",
+    "region": "CRO",
+    "phone": "501914503",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Ismael Hashim",
+    "region": "WRO",
+    "phone": "568625019",
+    "sector": "Health",
+    "team": "W-2"
+  },
+  {
+    "name": "Fawaz",
+    "region": "CRO",
+    "phone": "555369915",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Ashraf Attia",
+    "region": "CRO",
+    "phone": "547770613",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "Abdullah Alenazi",
+    "region": "CRO",
+    "phone": "506623708",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "محمد",
+    "region": "WRO",
+    "phone": "555057933",
+    "sector": "Mobility",
+    "team": "W-2"
+  },
+  {
+    "name": "Abdulaziz Aldawsari",
+    "region": "CRO",
+    "phone": "583333546",
+    "sector": "Health",
+    "team": "C-3"
+  },
+  {
+    "name": "OTHMAN ALHUMAID",
+    "region": "ERO",
+    "phone": "501121377",
+    "sector": "Health",
+    "team": "E-1"
+  },
+  {
+    "name": "زياد المطيري",
+    "region": "CRO",
+    "phone": "548696102",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "محمد فلاتة",
+    "region": "WRO",
+    "phone": "569695616",
+    "sector": "Mobility",
+    "team": "W-2"
+  },
+  {
+    "name": "mohamed mahamoud",
+    "region": "WRO",
+    "phone": "582927150",
+    "sector": "Health",
+    "team": "W-2"
+  },
+  {
+    "name": "عبدالله محمد السبيعي",
+    "region": "CRO",
+    "phone": "590068700",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Mohammed Alhamidi",
+    "region": "CRO",
+    "phone": "542236008",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Abdulaziz Aldawsari",
+    "region": "CRO",
+    "phone": "583333546",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "FAHAD AL MAWASH",
+    "region": "CRO",
+    "phone": "540888709",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "مهند محمد الشريف",
+    "region": "WRO",
+    "phone": "500372004",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "نايف",
+    "region": "WRO",
+    "phone": "583939305",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "Muath",
+    "region": "CRO",
+    "phone": "598911920",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Ali AL Jadar",
+    "region": "CRO",
+    "phone": "564318150",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Abdulrhman",
+    "region": "CRO",
+    "phone": "594545377",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Omar Elewah",
+    "region": "CRO",
+    "phone": "502923266",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Faisal Albisi",
+    "region": "CRO",
+    "phone": "555220059",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Tarek Magdy Ezzat Abbas",
+    "region": "CRO",
+    "phone": "591361740",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "wessam abdelmaaboud",
+    "region": "CRO",
+    "phone": "539677230",
+    "sector": "Health",
+    "team": "C-4"
+  },
+  {
+    "name": "Turki Alanazi",
+    "region": "CRO",
+    "phone": "535007667",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "nawaf mohammed alamri",
+    "region": "CRO",
+    "phone": "508420547",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "ELSAYED ALY",
+    "region": "CRO",
+    "phone": "567129325",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Dr.Essam Udden Mohamed Abdulhakeem",
+    "region": "CRO",
+    "phone": "553387156",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Mohammed Bin Thuwini",
+    "region": "CRO",
+    "phone": "599224420",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Abdullah Aljuraisi",
+    "region": "CRO",
+    "phone": "554437135",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Luai Alshaibani",
+    "region": "WRO",
+    "phone": "564277746",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "طاهر",
+    "region": "CRO",
+    "phone": "597697411",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Nahar Alkhaldi",
+    "region": "WRO",
+    "phone": "546644747",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "Bander Alluhayd",
+    "region": "CRO",
+    "phone": "545938651",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Mohammed Abdulrahman Aldawood",
+    "region": "CRO",
+    "phone": "544222408",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "سعود الموسر",
+    "region": "CRO",
+    "phone": "598511499",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Saad Abdelaal",
+    "region": "CRO",
+    "phone": "557900342",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "Mohannad Almashwakhi",
+    "region": "CRO",
+    "phone": "561039012",
+    "sector": "Health",
+    "team": "C-5"
+  },
+  {
+    "name": "HOSAM RAMADAN MEGAHED",
+    "region": "ERO",
+    "phone": "534518225",
+    "sector": "Health",
+    "team": "E-2"
+  },
+  {
+    "name": "DR UMAR MUHAMMAD",
+    "region": "ERO",
+    "phone": "592470427",
+    "sector": "Health",
+    "team": "E-1"
+  },
+  {
+    "name": "Aamer Sait",
+    "region": "WRO",
+    "phone": "557544235",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "BANDAR ALTHRWI",
+    "region": "WRO",
+    "phone": "567775960",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "محمد",
+    "region": "CRO",
+    "phone": "558006596",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Alrasheed",
+    "region": "CRO",
+    "phone": "542440872",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "ابراهيم العويس",
+    "region": "CRO",
+    "phone": "546894306",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Yazeed Aldossari",
+    "region": "CRO",
+    "phone": "557553054",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Fahad Almershed",
+    "region": "CRO",
+    "phone": "548097999",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Sami Majnan",
+    "region": "CRO",
+    "phone": "505225921",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Abdulrhman Saeed Almajadah",
+    "region": "CRO",
+    "phone": "535323659",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Fahad Alabdullah",
+    "region": "ERO",
+    "phone": "503810467",
+    "sector": "Health",
+    "team": "E-2"
+  },
+  {
+    "name": "khalid Alluhayd",
+    "region": "CRO",
+    "phone": "549555772",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "محمد بن مليح",
+    "region": "WRO",
+    "phone": "590014028",
+    "sector": "Customer Service and Marketing",
+    "team": "W-3"
+  },
+  {
+    "name": "Abdullah Alamoodi",
+    "region": "WRO",
+    "phone": "560922972",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "Ibrahim",
+    "region": "CRO",
+    "phone": "503755300",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Abdulaziz Algahtani",
+    "region": "CRO",
+    "phone": "550772197",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "yasser alhabdan",
+    "region": "CRO",
+    "phone": "555815580",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Mashari Alqasham",
+    "region": "CRO",
+    "phone": "533395820",
+    "sector": "Mobility",
+    "team": "C-6"
+  },
+  {
+    "name": "Saud Alrayes",
+    "region": "CRO",
+    "phone": "559639418",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Firas ali bakhshwain",
+    "region": "WRO",
+    "phone": "566826969",
+    "sector": "Customer Service and Marketing",
+    "team": "W-3"
+  },
+  {
+    "name": "Bader Sulaiman",
+    "region": "ERO",
+    "phone": "545291789",
+    "sector": "Mobility",
+    "team": "E-1"
+  },
+  {
+    "name": "SAAD ALZAKARI",
+    "region": "CRO",
+    "phone": "532375505",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "بدر البصيري",
+    "region": "CRO",
+    "phone": "546451598",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Islam Elshourbagy",
+    "region": "WRO",
+    "phone": "506771970",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "Khalid AlRshoud",
+    "region": "CRO",
+    "phone": "536490159",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Saif Alshehri",
+    "region": "WRO",
+    "phone": "537038877",
+    "sector": "Health",
+    "team": "W-3"
+  },
+  {
+    "name": "Murat Enes Asiliskender",
+    "region": "CRO",
+    "phone": "507140269",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Omar Alsaleem",
+    "region": "CRO",
+    "phone": "534149226",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Abdullah AlSherbini",
+    "region": "CRO",
+    "phone": "560691328",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "إيهاب الضامن",
+    "region": "ERO",
+    "phone": "503881991",
+    "sector": "Health",
+    "team": "E-2"
+  },
+  {
+    "name": "Yousef Alsadhan",
+    "region": "CRO",
+    "phone": "506349001",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Habeeb Ahamed",
+    "region": "CRO",
+    "phone": "551447893",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Abdulaziz Kaabi",
+    "region": "CRO",
+    "phone": "596557782",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "محمد الغوينم",
+    "region": "CRO",
+    "phone": "580313392",
+    "sector": "General",
+    "team": "C-7"
+  },
+  {
+    "name": "Mahmoud Abosheeta",
+    "region": "ERO",
+    "phone": "549783521",
+    "sector": "Health",
+    "team": "E-1"
+  },
+  {
+    "name": "Faisal Alhaj",
+    "region": "CRO",
+    "phone": "533581524",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "عبدالله الكثيري",
+    "region": "CRO",
+    "phone": "544451307",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "عيسى",
+    "region": "ERO",
+    "phone": "543377800",
+    "sector": "Mobility",
+    "team": "E-2"
+  },
+  {
+    "name": "mohd alhuneiti",
+    "region": "CRO",
+    "phone": "501540628",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Ahmed Mahmoud",
+    "region": "CRO",
+    "phone": "597414473",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Raad Alshahrani",
+    "region": "WRO",
+    "phone": "563132334",
+    "sector": "Mobility",
+    "team": "W-4"
+  },
+  {
+    "name": "Mohammed Saaquib Sayyed",
+    "region": "CRO",
+    "phone": "567916004",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Mohammed Bin Ghannam",
+    "region": "CRO",
+    "phone": "591233434",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Saajid Usmani",
+    "region": "CRO",
+    "phone": "566852065",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Moataz Reda",
+    "region": "CRO",
+    "phone": "531812407",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Ghulam Rasool",
+    "region": "CRO",
+    "phone": "547054186",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Amro Mukhtar Hassan",
+    "region": "CRO",
+    "phone": "502403920",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Khalid Sobhy",
+    "region": "CRO",
+    "phone": "535700374",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "Bahinour Ali",
+    "region": "CRO",
+    "phone": "592230181",
+    "sector": "Technology and Digital",
+    "team": "C-8"
+  },
+  {
+    "name": "HOSAM HAMMO",
+    "region": "CRO",
+    "phone": "598378554",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Faisal Bin Obaid",
+    "region": "CRO",
+    "phone": "505231687",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Ashwin",
+    "region": "CRO",
+    "phone": "545706723",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "khaled hamad alserihi",
+    "region": "CRO",
+    "phone": "531230312",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Mohamme ahmed babikir",
+    "region": "ERO",
+    "phone": "551481359",
+    "sector": "Health",
+    "team": "E-1"
+  },
+  {
+    "name": "abdullah saleh ahmed",
+    "region": "WRO",
+    "phone": "504915836",
+    "sector": "Health",
+    "team": "W-4"
+  },
+  {
+    "name": "Ahmed Moustafa",
+    "region": "CRO",
+    "phone": "582030877",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "mahmoud ramadan",
+    "region": "CRO",
+    "phone": "566186420",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Mohammad Tahat",
+    "region": "CRO",
+    "phone": "546550260",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Mahmoud Saeed",
+    "region": "CRO",
+    "phone": "558234151",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Mohammed Zamzami",
+    "region": "CRO",
+    "phone": "541444836",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Mohammad Aljahdali",
+    "region": "WRO",
+    "phone": "568183898",
+    "sector": "Health",
+    "team": "W-4"
+  },
+  {
+    "name": "فهد ابراهيم المناع",
+    "region": "CRO",
+    "phone": "530816235",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "KHALED JAMAL MOHAMMAD HASAN",
+    "region": "CRO",
+    "phone": "543677588",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "Abdulaziz Bin Saad",
+    "region": "WRO",
+    "phone": "508556699",
+    "sector": "Life",
+    "team": "W-4"
+  },
+  {
+    "name": "Mohammad Saqib Nazim",
+    "region": "CRO",
+    "phone": "567166491",
+    "sector": "Technology and Digital",
+    "team": "C-9"
+  },
+  {
+    "name": "محسن اليامي",
+    "region": "ERO",
+    "phone": "530787893",
+    "sector": "Health",
+    "team": "E-2"
+  },
+  {
+    "name": "TURKI ALHARBI",
+    "region": "CRO",
+    "phone": "552838055",
+    "sector": "Governance",
+    "team": "C-13"
+  },
+  {
+    "name": "Hassan Jichy",
+    "region": "CRO",
+    "phone": "506159128",
+    "sector": "Governance",
+    "team": "C-13"
+  },
+  {
+    "name": "Abdulrahman alaql",
+    "region": "CRO",
+    "phone": "544028822",
+    "sector": "Finance",
+    "team": "C-13"
+  },
+  {
+    "name": "فيصل الماضي",
+    "region": "CRO",
+    "phone": "556858533",
+    "sector": "Governance",
+    "team": "C-14"
+  },
+  {
+    "name": "Abdulrhman Almujahed",
+    "region": "CRO",
+    "phone": "598003016",
+    "sector": "Finance",
+    "team": "C-14"
+  },
+  {
+    "name": "مشعل الحرابي",
+    "region": "CRO",
+    "phone": "556161617",
+    "sector": "Finance",
+    "team": "C-13"
+  },
+  {
+    "name": "Muath Alhumaid",
+    "region": "CRO",
+    "phone": "966562319606",
+    "sector": "Technology and Digital",
+    "team": "C-13"
+  },
+  {
+    "name": "Ghassan",
+    "region": "WRO",
+    "phone": "547117103",
+    "sector": "Health",
+    "team": "W-4"
+  },
+  {
+    "name": "KHALID",
+    "region": "WRO",
+    "phone": "567622205",
+    "sector": "Health",
+    "team": "W-4"
+  },
+  {
+    "name": "Abdulaziz Alsayed",
+    "region": "WRO",
+    "phone": "547258390",
+    "sector": "Health",
+    "team": "W-4"
+  },
+  {
+    "name": "Naif Binsaleem",
+    "region": "CRO",
+    "phone": "563544414",
+    "sector": "Governance",
+    "team": "C-14"
+  },
+  {
+    "name": "Fahad Alqahtani",
+    "region": "CRO",
+    "phone": "504109170",
+    "sector": "Technology and Digital",
+    "team": "C-13"
+  },
+  {
+    "name": "Ali Althagafi",
+    "region": "WRO",
+    "phone": "540068068",
+    "sector": "Customer Service and Marketing",
+    "team": "W-4"
+  },
+  {
+    "name": "بندر بكري الشهري",
+    "region": "CRO",
+    "phone": "569223903",
+    "sector": "Customer Service and Marketing",
+    "team": "C-13"
+  },
+  {
+    "name": "Ahmed Alkhathlan",
+    "region": "WRO",
+    "phone": "544843952",
+    "sector": "Mobility",
+    "team": "W-4"
+  },
+  {
+    "name": "Shailank singh",
+    "region": "CRO",
+    "phone": "531610556",
+    "sector": "Technology and Digital",
+    "team": "C-14"
+  },
+  {
+    "name": "YAHIA HAWSAWI",
+    "region": "CRO",
+    "phone": "554788496",
+    "sector": "Customer Service and Marketing",
+    "team": "C-14"
+  },
+  {
+    "name": "Amjad Alghamdi",
+    "region": "WRO",
+    "phone": "565379436",
+    "sector": "Mobility",
+    "team": "W-4"
+  },
+  {
+    "name": "Abdulaziz Muhammed",
+    "region": "CRO",
+    "phone": "552428294",
+    "sector": "Human Resources",
+    "team": "C-13"
+  },
+  {
+    "name": "abdulaziz alharbi",
+    "region": "CRO",
+    "phone": "5588223133",
+    "sector": "Finance",
+    "team": "C-13"
+  },
+  {
+    "name": "تركي صالح المصلوخ",
+    "region": "CRO",
+    "phone": "555107195",
+    "sector": "Technology and Digital",
+    "team": "C-14"
+  },
+  {
+    "name": "أحمد المطوع",
+    "region": "CRO",
+    "phone": "542667371",
+    "sector": "Technology and Digital",
+    "team": "C-14"
+  },
+  {
+    "name": "نايف الرويلي",
+    "region": "CRO",
+    "phone": "546662451",
+    "sector": "Finance",
+    "team": "C-14"
+  },
+  {
+    "name": "نايف بن جبهان",
+    "region": "CRO",
+    "phone": "580381109",
+    "sector": "Life",
+    "team": "C-14"
+  },
+  {
+    "name": "Mohamewd Khafagy",
+    "region": "CRO",
+    "phone": "543126939",
+    "sector": "Strategy",
+    "team": "C-14"
+  },
+  {
+    "name": "يحيى",
+    "region": "CRO",
+    "phone": "531233347",
+    "sector": "Customer Service and Marketing",
+    "team": "C-13"
+  },
+  {
+    "name": "نايف خالد الجدعان",
+    "region": "CRO",
+    "phone": "535664263",
+    "sector": "Customer Service and Marketing",
+    "team": "C-14"
+  },
+  {
+    "name": "Ali",
+    "region": "CRO",
+    "phone": "592193624",
+    "sector": "Health",
+    "team": "C-13"
+  },
+  {
+    "name": "سعود الموسر",
+    "region": "CRO",
+    "phone": "598511499",
+    "sector": "Health",
+    "team": "C-14"
+  }
+];
+
+        // --- Data Processing Component ---
+        const processTeams = (data) => {
+            const teams = {};
+            data.forEach(player => {
+                const teamName = player.team;
+                if (!teams[teamName]) {
+                    teams[teamName] = {
+                        id: teamName,
+                        region: player.region,
+                        players: []
+                    };
+                }
+                teams[teamName].players.push(player);
+            });
+            return teams;
+        };
+
+        const TEAMS_DB = processTeams(RAW_ROSTER_DATA);
+
+        // --- Components ---
+
+        const TabButton = ({ id, label, icon: Icon, activeTab, setActiveTab }) => (
+            <button
+                onClick={() => setActiveTab(id)}
+                className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                    activeTab === id ? 'tab-active' : 'tab-inactive'
+                }`}
+            >
+                <Icon size={18} />
+                <span>{label}</span>
+            </button>
+        );
+
+        const TeamRosterCard = ({ teamId, players, colorClass }) => (
+            <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className={`${colorClass} p-4 text-white flex justify-between items-center`}>
+                    <div className="flex items-center gap-2">
+                        <Shirt size={20} />
+                        <h3 className="font-bold text-lg">فريق {teamId}</h3>
+                    </div>
+                    <span className="bg-white/20 px-2 py-1 rounded text-xs font-bold">{players.length} لاعبين</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                    {players.map((player, idx) => (
+                        <div key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <p className="font-bold text-gray-800">{player.name}</p>
+                                    <div className="flex items-center gap-4 mt-1">
+                                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                                            <Briefcase size={12} />
+                                            <span>{player.sector}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-left" dir="ltr">
+                                    <a href={`tel:${player.phone}`} className="flex items-center gap-1 text-sm font-mono text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-1 rounded">
+                                        <Phone size={12} />
+                                        {player.phone}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const TeamsGrid = ({ regionCode, prefix, colorHeader }) => {
+            // Filter teams by region AND prefix
+            const filteredTeams = Object.values(TEAMS_DB).filter(t => 
+                (t.region === regionCode) || (t.id.startsWith(prefix))
+            );
+
+            // Sort mainly by Team ID number (C-1, C-2...)
+            filteredTeams.sort((a, b) => {
+                const numA = parseInt(a.id.split('-')[1]) || 0;
+                const numB = parseInt(b.id.split('-')[1]) || 0;
+                return numA - numB;
+            });
+
+            if (filteredTeams.length === 0) {
+                return (
+                    <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
+                        <Users size={48} className="mx-auto text-gray-300 mb-2" />
+                        <p className="text-gray-500">لا توجد فرق مسجلة في هذا القسم حالياً</p>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredTeams.map((team) => (
+                        <TeamRosterCard 
+                            key={team.id} 
+                            teamId={team.id} 
+                            players={team.players} 
+                            colorClass={colorHeader} 
+                        />
+                    ))}
+                </div>
+            );
+        };
+
+        const MatchCard = ({ match, isFinal = false }) => (
+            <div className={`relative flex flex-col items-center justify-center p-4 bg-white border rounded-lg shadow-sm transition-shadow hover:shadow-md ${isFinal ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'}`}>
+                <div className="text-xs font-bold text-gray-400 mb-2">{match.title || "المباراة"}</div>
+                <div className="flex items-center justify-between w-full gap-4">
+                    <div className="font-bold text-gray-800 text-center w-1/3 bg-gray-100 p-2 rounded truncate">{match.team1}</div>
+                    <div className="text-sm font-mono text-gray-500">VS</div>
+                    <div className="font-bold text-gray-800 text-center w-1/3 bg-gray-100 p-2 rounded truncate">{match.team2}</div>
+                </div>
+                <div className="mt-3 flex items-center justify-center w-full">
+                    <div className="flex items-center text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                        <Clock size={12} className="ml-1" />
+                        {match.time}
+                    </div>
+                </div>
+            </div>
+        );
+
+        const BracketNode = ({ label, subLabel, isFinal }) => (
+            <div className={`relative flex flex-col justify-center items-center w-32 md:w-40 p-2 text-center border rounded shadow-sm bg-white z-10 ${isFinal ? 'border-yellow-500 ring-2 ring-yellow-200' : 'border-gray-300'}`}>
+                <span className="font-bold text-gray-800 text-sm">{label}</span>
+                {subLabel && <span className="text-xs text-gray-500 mt-1">{subLabel}</span>}
+            </div>
+        );
+
+        const TournamentApp = () => {
+            const [activeTab, setActiveTab] = useState('riyadh-roster'); // Default to Riyadh Roster
+
+            // --- Schedule Data ---
+            const dammamData = { teams: 2, system: "مباراة فاصلة", matches: [{ id: 1, team1: "الفريق D1", team2: "الفريق D2", time: "7:00 – 7:40 مساءً", status: "qualifier" }] };
+            const jeddahData = { teams: 4, system: "خروج مغلوب", matches: [
+                { id: 1, title: "نصف النهائي 1", team1: "J1", team2: "J2", time: "7:00 – 7:40 م" },
+                { id: 2, title: "نصف النهائي 2", team1: "J3", team2: "J4", time: "7:50 – 8:30 م" },
+                { id: 3, title: "النهائي", team1: "فائز 1", team2: "فائز 2", time: "10:00 – 10:40 م" },
+            ]};
+            const riyadhSchedule = [
+                { day: "اليوم 1 – دور الـ 16", matches: [{ time: "7:00 – 7:40", pitchA: "مباراة 1", pitchB: "مباراة 2" }, { time: "7:50 – 8:30", pitchA: "مباراة 3", pitchB: "مباراة 4" }, { time: "8:40 – 9:20", pitchA: "مباراة 5", pitchB: "مباراة 6" }, { time: "9:30 – 10:10", pitchA: "مباراة 7", pitchB: "مباراة 8" }] },
+                { day: "اليوم 2 – ربع النهائي", matches: [{ time: "7:00 – 7:40", pitchA: "ربع نهائي 1", pitchB: "ربع نهائي 2" }, { time: "7:50 – 8:30", pitchA: "ربع نهائي 3", pitchB: "ربع نهائي 4" }] }
+            ];
+
+            return (
+                <div className="min-h-screen bg-gray-50 font-sans pb-12" dir="rtl">
+                    {/* Header */}
+                    <header className="bg-gradient-to-l from-blue-900 to-blue-700 text-white p-6 shadow-lg">
+                        <div className="container mx-auto flex items-center gap-4">
+                            <div className="p-3 bg-white/20 rounded-full">
+                                <Trophy size={32} className="text-yellow-300" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold">بطولة الموظفين 2025</h1>
+                                <p className="text-blue-100 text-sm">الجداول وتشكيلات الفرق</p>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation */}
+                    <div className="bg-white shadow-sm sticky top-0 z-30 overflow-x-auto">
+                        <div className="container mx-auto flex min-w-max p-1">
+                            <TabButton id="riyadh-roster" label="فرق الرياض (C)" icon={Users} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <TabButton id="jeddah-roster" label="فرق جدة (W)" icon={Users} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <TabButton id="dammam-roster" label="فرق الدمام (E)" icon={Users} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <div className="w-px h-8 bg-gray-200 mx-2 self-center"></div>
+                            <TabButton id="dammam-schedule" label="جدول الدمام" icon={MapPin} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <TabButton id="jeddah-schedule" label="جدول جدة" icon={MapPin} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <TabButton id="riyadh-bracket" label="شجرة الرياض" icon={Shield} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <TabButton id="riyadh-schedule" label="جدول الرياض" icon={Calendar} activeTab={activeTab} setActiveTab={setActiveTab} />
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <main className="container mx-auto p-4 md:p-8">
+                        
+                        {/* --- ROSTER VIEWS --- */}
+                        {activeTab === 'riyadh-roster' && (
+                            <div>
+                                <div className="mb-6 border-b pb-4">
+                                    <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق الرياض (CRO)</h2>
+                                    <p className="text-gray-500">الفرق التي تبدأ بحرف C</p>
+                                </div>
+                                <TeamsGrid regionCode="CRO" prefix="C" colorHeader="bg-blue-600" />
+                            </div>
+                        )}
+
+                        {activeTab === 'jeddah-roster' && (
+                            <div>
+                                <div className="mb-6 border-b pb-4">
+                                    <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق جدة (WRO)</h2>
+                                    <p className="text-gray-500">الفرق التي تبدأ بحرف W</p>
+                                </div>
+                                <TeamsGrid regionCode="WRO" prefix="W" colorHeader="bg-cyan-600" />
+                            </div>
+                        )}
+
+                        {activeTab === 'dammam-roster' && (
+                            <div>
+                                <div className="mb-6 border-b pb-4">
+                                    <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق الدمام (ERO)</h2>
+                                    <p className="text-gray-500">الفرق التي تبدأ بحرف E</p>
+                                </div>
+                                <TeamsGrid regionCode="ERO" prefix="E" colorHeader="bg-emerald-600" />
+                            </div>
+                        )}
+
+                        {/* --- SCHEDULE VIEWS (Existing Code) --- */}
+                        {activeTab === 'dammam-schedule' && (
+                            <div className="max-w-2xl mx-auto bg-white rounded-xl shadow p-6">
+                                <h2 className="text-xl font-bold text-blue-800 mb-4 text-center">تصفيات الدمام</h2>
+                                <MatchCard match={dammamData.matches[0]} />
+                                <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded text-center text-green-800 font-bold">
+                                    الفائز يتأهل مباشرة لنهائيات الرياض
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'jeddah-schedule' && (
+                            <div className="max-w-4xl mx-auto">
+                                <h2 className="text-xl font-bold text-blue-800 mb-6 text-center">تصفيات جدة</h2>
+                                <div className="grid md:grid-cols-2 gap-8 items-center">
+                                    <div className="space-y-4">
+                                        <MatchCard match={jeddahData.matches[0]} />
+                                        <MatchCard match={jeddahData.matches[1]} />
+                                    </div>
+                                    <MatchCard match={jeddahData.matches[2]} isFinal={true} />
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'riyadh-bracket' && (
+                            <div className="overflow-x-auto pb-8">
+                                <div className="min-w-[800px] flex justify-between gap-4">
+                                    <div className="flex flex-col justify-around gap-4">
+                                        <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded">دور الـ 16</div>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(i => <BracketNode key={i} label={`فريق (${i})`} subLabel={i % 2 !== 0 ? `مباراة ${Math.ceil(i/2)}` : null} />)}
+                                    </div>
+                                    <div className="flex flex-col justify-around gap-16 mt-12">
+                                         <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded -mt-16">ربع النهائي</div>
+                                         {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <BracketNode key={i} label={`فائز ${i}`} subLabel={`ربع نهائي ${Math.ceil(i/2)}`} />)}
+                                    </div>
+                                    <div className="flex flex-col justify-around gap-32 mt-24">
+                                        <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded -mt-24">نصف النهائي</div>
+                                        {[1, 2, 3, 4].map(i => <BracketNode key={i} label={`فائز ربع ${i}`} subLabel={`نصف نهائي ${Math.ceil(i/2)}`} />)}
+                                    </div>
+                                    <div className="flex flex-col justify-center items-center gap-4">
+                                        <div className="text-center font-bold text-yellow-700 mb-4 bg-yellow-100 py-1 rounded w-full">النهائي</div>
+                                        <div className="border-l-2 h-16 border-gray-300"></div>
+                                        <div className="p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg flex flex-col items-center">
+                                            <Trophy size={48} className="text-yellow-500 mb-2" />
+                                            <span className="font-bold text-yellow-800">بطل الكأس</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'riyadh-schedule' && (
+                            <div className="max-w-5xl mx-auto space-y-6">
+                                {riyadhSchedule.map((day, idx) => (
+                                    <div key={idx} className="bg-white rounded-lg shadow border overflow-hidden">
+                                        <div className="bg-blue-600 text-white p-3 font-bold flex justify-between">
+                                            <span>{day.day}</span>
+                                            <Calendar size={18} />
+                                        </div>
+                                        <table className="w-full text-right text-sm">
+                                            <thead className="bg-gray-50 text-gray-500">
+                                                <tr><th className="p-3">الوقت</th><th className="p-3">الملعب A</th><th className="p-3">الملعب B</th></tr>
+                                            </thead>
+                                            <tbody className="divide-y">
+                                                {day.matches.map((m, i) => (
+                                                    <tr key={i} className="hover:bg-gray-50"><td className="p-3 font-mono">{m.time}</td><td className="p-3 font-bold">{m.pitchA}</td><td className="p-3">{m.pitchB}</td></tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<TournamentApp />);
+    </script>
+</body>
+</html>
