@@ -1746,33 +1746,46 @@
     const hasScorers1 = Array.isArray(match.scorers1) && match.scorers1.length > 0;
     const hasScorers2 = Array.isArray(match.scorers2) && match.scorers2.length > 0;
 
+    // تنسيق نص عدد الأهداف بالعربي مع إيموجي كرة
+    const formatGoals = (g) => {
+        if (g === 1) return "هدف ⚽";
+        if (g === 2) return "هدفين ⚽";
+        return `${g} أهداف ⚽`;
+    };
+
     return (
         <div
             className={`relative flex flex-col items-center justify-center p-4 bg-white border rounded-lg shadow-sm transition-shadow hover:shadow-md ${
                 isFinal ? "border-yellow-400 bg-yellow-50" : "border-gray-200"
             }`}
         >
+            {/* عنوان المباراة */}
             <div className="text-xs font-bold text-gray-400 mb-2">
                 {match.title || "المباراة"}
             </div>
 
             <div className="flex items-start justify-between w-full gap-4">
-                {/* Team 1 */}
+                {/* الفريق الأول */}
                 <div className="w-1/3 bg-gray-100 p-2 rounded text-center">
                     <div className="font-bold text-gray-800 truncate">
                         {match.team1}
                     </div>
+
                     {hasScorers1 && (
-                        <div className="mt-1 text-[11px] text-gray-600 leading-snug">
-                            <span className="font-semibold">سجّل:</span>{" "}
-                            {match.scorers1.join("، ")}
+                        <div className="mt-2 text-[11px] text-gray-700 leading-snug text-right">
+                            {match.scorers1.map((s, i) => (
+                                <div key={i}>
+                                    {s.name} – {formatGoals(s.goals)}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
 
-                {/* Score in the middle */}
+                {/* النتيجة في المنتصف */}
                 <div className="flex flex-col items-center justify-center min-w-[70px]">
                     <div className="text-sm font-mono text-gray-500">VS</div>
+
                     {hasResult && (
                         <div className="mt-1 text-sm font-bold bg-green-50 text-green-700 px-3 py-1 rounded-full">
                             {match.score1} - {match.score2}
@@ -1780,20 +1793,25 @@
                     )}
                 </div>
 
-                {/* Team 2 */}
+                {/* الفريق الثاني */}
                 <div className="w-1/3 bg-gray-100 p-2 rounded text-center">
                     <div className="font-bold text-gray-800 truncate">
                         {match.team2}
                     </div>
+
                     {hasScorers2 && (
-                        <div className="mt-1 text-[11px] text-gray-600 leading-snug">
-                            <span className="font-semibold">سجّل:</span>{" "}
-                            {match.scorers2.join("، ")}
+                        <div className="mt-2 text-[11px] text-gray-700 leading-snug text-right">
+                            {match.scorers2.map((s, i) => (
+                                <div key={i}>
+                                    {s.name} – {formatGoals(s.goals)}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
             </div>
 
+            {/* الوقت */}
             <div className="mt-3 flex items-center justify-center w-full">
                 <div className="flex items-center text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
                     <Clock size={12} className="ml-1" />
@@ -1803,6 +1821,7 @@
         </div>
     );
 };
+
 
 
         const BracketNode = ({ label, subLabel, isFinal }) => (
@@ -1816,29 +1835,37 @@
             const [activeTab, setActiveTab] = useState('riyadh-roster'); // Default to Riyadh Roster
 
             // --- Schedule Data ---
+// --- Schedule Data ---
 const dammamData = { 
     teams: 2, 
     system: "مباراة فاصلة", 
     matches: [
         { 
             id: 1,
+            title: "مباراة الدمام الفاصلة",
             team1: "الفريق E-1",
             team2: "الفريق E-2",
             time: "الأربعاء 10/12 | 7:30 – 8:10 م",
             status: "finished",
-            score1: 3,                 // عدد أهداف الفريق الأول
-            score2: 1,                 // عدد أهداف الفريق الثاني
+
+            // النتيجة النهائية للمباراة
+            score1: 3,
+            score2: 1,
+
+            // المسجّلون للفريق الأول
             scorers1: [
-                "أحمد محمد",
-                "سعود العتيبي",
-                "سعود العتيبي"       // تقدر تكرر الاسم لو سجل هدفين
+                { name: "محمد معروف", goals: 2 },
+                { name: "عبدالرحمن", goals: 1 },
             ],
+
+            // المسجّلون للفريق الثاني
             scorers2: [
-                "خالد العامري"
-            ]
+                { name: "خالد", goals: 1 },
+            ],
         }
     ] 
 };
+
 
 
 const jeddahData = { 
@@ -1852,10 +1879,19 @@ const jeddahData = {
             team2: "W-2",
             time: "الثلاثاء 9/12 | 7:00 – 7:40 م",
             status: "finished",
-            score1: 2,
-            score2: 0,
-            scorers1: ["محمد معروف", "Abdulrahman"],
-            scorers2: []
+
+            // النتيجة
+            score1: 3,
+            score2: 1,
+
+            // المسجّلون
+            scorers1: [
+                { name: "محمد معروف", goals: 2 },
+                { name: "علي", goals: 1 },
+            ],
+            scorers2: [
+                { name: "عبدالرحمن", goals: 1 },
+            ],
         },
         { 
             id: 2,
@@ -1864,21 +1900,28 @@ const jeddahData = {
             team2: "W-4",
             time: "الثلاثاء 9/12 | 7:50 – 8:30 م",
             status: "finished",
+
             score1: 1,
             score2: 1,
-            scorers1: ["Ghassan"],
-            scorers2: ["KHALID"]
+
+            scorers1: [
+                { name: "Ghassan", goals: 1 },
+            ],
+            scorers2: [
+                { name: "KHALID", goals: 1 },
+            ],
         },
         { 
             id: 3,
             title: "النهائي",
             team1: "فائز 1",
             team2: "فائز 2",
-            time: "الأربعاء 10/12 | 7:00 – 7:40 م"
-            // لا تضيف scorers هنا إلا بعد المباراة
+            time: "الأربعاء 10/12 | 7:00 – 7:40 م",
+            // لا تضيف score أو scorers هنا إلا بعد ما تتحدد النتيجة
         },
     ]
 };
+
 
             const riyadhSchedule = [
                 { 
@@ -2080,6 +2123,7 @@ const jeddahData = {
     </script>
 </body>
 </html>
+
 
 
 
