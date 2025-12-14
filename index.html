@@ -2028,217 +2028,258 @@ const jeddahData = {
 
                     {/* Content */}
                     <main className="container mx-auto p-4 md:p-8">
-                        
-                        {/* --- ROSTER VIEWS --- */}
-                        {activeTab === 'riyadh-roster' && (
-                            <div>
-                                <div className="mb-6 border-b pb-4">
-                                    <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق الرياض (CRO)</h2>
-                                    <p className="text-gray-500">الفرق التي تبدأ بحرف C</p>
-                                </div>
-                                <TeamsGrid regionCode="CRO" prefix="C" colorHeader="bg-blue-600" />
-                            </div>
-                        )}
-
-                        {activeTab === 'jeddah-roster' && (
-                            <div>
-                                <div className="mb-6 border-b pb-4">
-                                    <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق جدة (WRO)</h2>
-                                    <p className="text-gray-500">الفرق التي تبدأ بحرف W</p>
-                                </div>
-                                <TeamsGrid regionCode="WRO" prefix="W" colorHeader="bg-cyan-600" />
-                            </div>
-                        )}
-
-                        {activeTab === 'dammam-roster' && (
-                            <div>
-                                <div className="mb-6 border-b pb-4">
-                                    <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق الدمام (ERO)</h2>
-                                    <p className="text-gray-500">الفرق التي تبدأ بحرف E</p>
-                                </div>
-                                <TeamsGrid regionCode="ERO" prefix="E" colorHeader="bg-emerald-600" />
-                            </div>
-                        )}
-
-                        {/* --- SCHEDULE VIEWS (Existing Code) --- */}
-                        {activeTab === 'dammam-schedule' && (
-                            <div className="max-w-2xl mx-auto bg-white rounded-xl shadow p-6">
-                                <h2 className="text-xl font-bold text-blue-800 mb-4 text-center">تصفيات الدمام</h2>
-                                <MatchCard match={dammamData.matches[0]} />
-                                <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded text-center text-green-800 font-bold">
-                                    الفائز يتأهل مباشرة لنهائيات الرياض
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'jeddah-schedule' && (
-                            <div className="max-w-4xl mx-auto">
-                                <h2 className="text-xl font-bold text-blue-800 mb-6 text-center">تصفيات جدة</h2>
-                                {/* --- LOCATION FOR JEDDAH FINAL --- */}
-<div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center justify-between">
-    <div className="flex items-center gap-3">
-        <div className="bg-blue-600 text-white p-2 rounded-full">
-            <MapPin size={24} />
-        </div>
+    
+    {/* --- ROSTER VIEWS --- */}
+    {activeTab === 'riyadh-roster' && (
         <div>
-            <h3 className="font-bold text-blue-900">موقع ملعب نهائي جدة</h3>
-            <p className="text-sm text-blue-700">الملعب المخصص لمباراة النهائي</p>
+            <div className="mb-6 border-b pb-4">
+                <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق الرياض (CRO)</h2>
+                <p className="text-gray-500">الفرق التي تبدأ بحرف C</p>
+            </div>
+            <TeamsGrid regionCode="CRO" prefix="C" colorHeader="bg-blue-600" />
         </div>
-    </div>
+    )}
 
-    <a 
-        href="https://maps.app.goo.gl/72z1YFPHm1QWETNr6?g_st=ic"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2"
-    >
-        <span>الذهاب للموقع</span>
-        <MapPin size={18} />
-    </a>
-</div>
+    {activeTab === 'jeddah-roster' && (
+        <div>
+            <div className="mb-6 border-b pb-4">
+                <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق جدة (WRO)</h2>
+                <p className="text-gray-500">الفرق التي تبدأ بحرف W</p>
+            </div>
+            <TeamsGrid regionCode="WRO" prefix="W" colorHeader="bg-cyan-600" />
+        </div>
+    )}
 
-                                <div className="grid md:grid-cols-2 gap-8 items-center">
-                                    <div className="space-y-4">
-                                        <MatchCard match={jeddahData.matches[0]} />
-                                        <MatchCard match={jeddahData.matches[1]} />
-                                    </div>
-                                    <MatchCard match={jeddahData.matches[2]} isFinal={true} />
-                                </div>
-                            </div>
-                        )}
+    {activeTab === 'dammam-roster' && (
+        <div>
+            <div className="mb-6 border-b pb-4">
+                <h2 className="text-2xl font-bold text-gray-800">تشكيلات فرق الدمام (ERO)</h2>
+                <p className="text-gray-500">الفرق التي تبدأ بحرف E</p>
+            </div>
+            <TeamsGrid regionCode="ERO" prefix="E" colorHeader="bg-emerald-600" />
+        </div>
+    )}
 
-                        {activeTab === 'riyadh-bracket' && (
-                            <div className="overflow-x-auto pb-8">
-                                <div className="min-w-[800px] flex justify-between gap-4">
-                                    <div className="flex flex-col justify-around gap-4">
-                                        <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded">دور الـ 16</div>
-                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(i => <BracketNode key={i} label={`فريق (${i})`} subLabel={i % 2 !== 0 ? `مباراة ${Math.ceil(i/2)}` : null} />)}
-                                    </div>
-                                    <div className="flex flex-col justify-around gap-16 mt-12">
-                                         <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded -mt-16">ربع النهائي</div>
-                                         {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <BracketNode key={i} label={`فائز ${i}`} subLabel={`ربع نهائي ${Math.ceil(i/2)}`} />)}
-                                    </div>
-                                    <div className="flex flex-col justify-around gap-32 mt-24">
-                                        <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded -mt-24">نصف النهائي</div>
-                                        {[1, 2, 3, 4].map(i => <BracketNode key={i} label={`فائز ربع ${i}`} subLabel={`نصف نهائي ${Math.ceil(i/2)}`} />)}
-                                    </div>
-                                    <div className="flex flex-col justify-center items-center gap-4">
-                                        <div className="text-center font-bold text-yellow-700 mb-4 bg-yellow-100 py-1 rounded w-full">النهائي</div>
-                                        <div className="border-l-2 h-16 border-gray-300"></div>
-                                        <div className="p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg flex flex-col items-center">
-                                            <Trophy size={48} className="text-yellow-500 mb-2" />
-                                            <span className="font-bold text-yellow-800">بطل الكأس</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+    {/* --- DAMMAM SCHEDULE --- */}
+    {activeTab === 'dammam-schedule' && (
+        <div className="max-w-2xl mx-auto bg-white rounded-xl shadow p-6">
+            <h2 className="text-xl font-bold text-blue-800 mb-4 text-center">تصفيات الدمام</h2>
+            <MatchCard match={dammamData.matches[0]} />
+            <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded text-center text-green-800 font-bold">
+                الفائز يتأهل مباشرة لنهائيات الرياض
+            </div>
+        </div>
+    )}
 
-                        {activeTab === 'riyadh-schedule' && (
-                            <div className="max-w-5xl mx-auto space-y-6">
-                                {/* New Location Block */}
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-blue-600 text-white p-2 rounded-full">
-                                            <MapPin size={24} />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-blue-900">موقع مباريات الرياض</h3>
-                                            <p className="text-sm text-blue-700">جميع المباريات تقام في هذا الموقع</p>
-                                        </div>
-                                    </div>
-                                    <a 
-                                        href="https://maps.app.goo.gl/wJ3YAcEqrV3xnAWJ7" 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2"
-                                    >
-                                        <span>الذهاب للموقع</span>
-                                        <MapPin size={18} />
-                                    </a>
-                                </div>
+    {/* --- JEDDAH SCHEDULE --- */}
+    {activeTab === 'jeddah-schedule' && (
+        <div className="max-w-4xl mx-auto">
+            <h2 className="text-xl font-bold text-blue-800 mb-6 text-center">تصفيات جدة</h2>
 
-                                {riyadhSchedule.map((day, idx) => (
-                                    <div key={idx} className="bg-white rounded-lg shadow border overflow-hidden">
-                                        <div className="bg-blue-600 text-white p-3 font-bold flex justify-between">
-                                            <span>{day.day}</span>
-                                            <Calendar size={18} />
-                                        </div>
-                                        <table className="w-full text-right text-sm">
-                                            <thead className="bg-gray-50 text-gray-500">
-                                                <tr>
-                                                    <th className="p-3">الوقت</th>
-                                                    <th className="p-3">الملعب A</th>
-                                                    <th className="p-3">الملعب B</th>
-                                                    <th className="p-3">الملعب C</th>
-                                                    <th className="p-3">الملعب D</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y">
-                                                {day.matches.map((m, i) => (
-                                                    <tr key={i} className="hover:bg-gray-50">
-                                                        <td className="p-3 font-mono">{m.time}</td>
-                                                        <td className="p-3 font-bold">{m.pitchA || "—"}</td>
-                                                        <td className="p-3 font-bold">{m.pitchB || "—"}</td>
-                                                        <td className="p-3 font-bold">{m.pitchC || "—"}</td>
-                                                        <td className="p-3 font-bold">{m.pitchD || "—"}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ))}
-                        {activeTab === 'rules' && (
-                            <div className="max-w-3xl mx-auto space-y-6">
-                                <div className="bg-white rounded-xl shadow border p-6">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="bg-blue-600 text-white p-2 rounded-full">
-                                            <Shield size={24} />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-gray-800">نظام بطولة الموظفين</h2>
-                                            <p className="text-sm text-gray-500">القواعد الأساسية للبطولة</p>
-                                        </div>
-                                    </div>
-                        
-                                    <div className="space-y-4 text-sm leading-relaxed text-gray-800">
-                                        <div className="border-b pb-3">
-                                            <h3 className="font-bold text-blue-800 mb-1">مدة المباراة</h3>
-                                            <p>زمن المباراة ٤٠ دقيقة، مقسّمة على شوطين، كل شوط ٢٠ دقيقة، مع راحة بين الشوطين مدتها ١٠ دقائق.</p>
-                                        </div>
-                        
-                                        <div className="border-b pb-3">
-                                            <h3 className="font-bold text-blue-800 mb-1">عدد اللاعبين</h3>
-                                            <p>اللعب بنظام <span className="font-semibold">٨ ضد ٨</span> داخل الملعب.</p>
-                                        </div>
-                        
-                                        <div className="border-b pb-3">
-                                            <h3 className="font-bold text-blue-800 mb-1">التبديلات</h3>
-                                            <p>التبديلات <span className="font-semibold">مفتوحة</span> طوال المباراة، وفق توجيهات الحكم ومنظم البطولة.</p>
-                                        </div>
-                        
-                                        <div className="border-b pb-3">
-                                            <h3 className="font-bold text-blue-800 mb-1">الزي الرياضي</h3>
-                                            <p>
-                                                يجب الالتزام بالزي الرياضي المناسب، بما في ذلك 
-                                                <span className="font-semibold"> حذاء كرة القدم</span> المخصص للعب على العشب الصناعي/الملعب المعتمد.
-                                            </p>
-                                        </div>
-                        
-                                        <div className="border-b pb-3">
-                                            <h3 className="font-bold text-blue-800 mb-1">صديريات البطولة</h3>
-                                            <p>ستتم توزيع صديريات خاصة بشعار <span className="font-semibold">التعاونية</span> على الفرق قبل بداية المباراة، ويلتزم اللاعبون بارتدائها أثناء اللعب.</p>
-                                        </div>
-                        
-                                        <div>
-                                            <h3 className="font-bold text-blue-800 mb-1">نظام البطولة</h3>
-                                            <p>البطولة تُقام بنظام <span className="font-semibold">خروج المغلوب</span>، بحيث يتأهل الفائز من كل مباراة إلى الدور التالي حتى النهائي.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </main>
+            {/* موقع ملعب النهائي في جدة */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 text-white p-2 rounded-full">
+                        <MapPin size={24} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-blue-900">موقع ملعب نهائي جدة</h3>
+                        <p className="text-sm text-blue-700">الملعب المخصص لمباراة النهائي</p>
+                    </div>
+                </div>
+
+                <a 
+                    href="https://maps.app.goo.gl/72z1YFPHm1QWETNr6?g_st=ic"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2"
+                >
+                    <span>الذهاب للموقع</span>
+                    <MapPin size={18} />
+                </a>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="space-y-4">
+                    <MatchCard match={jeddahData.matches[0]} />
+                    <MatchCard match={jeddahData.matches[1]} />
+                </div>
+                <MatchCard match={jeddahData.matches[2]} isFinal={true} />
+            </div>
+        </div>
+    )}
+
+    {/* --- RIYADH BRACKET --- */}
+    {activeTab === 'riyadh-bracket' && (
+        <div className="overflow-x-auto pb-8">
+            <div className="min-w-[800px] flex justify-between gap-4">
+                <div className="flex flex-col justify-around gap-4">
+                    <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded">
+                        دور الـ 16
+                    </div>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(i => (
+                        <BracketNode
+                            key={i}
+                            label={`فريق (${i})`}
+                            subLabel={i % 2 !== 0 ? `مباراة ${Math.ceil(i / 2)}` : null}
+                        />
+                    ))}
+                </div>
+                <div className="flex flex-col justify-around gap-16 mt-12">
+                    <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded -mt-16">
+                        ربع النهائي
+                    </div>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                        <BracketNode
+                            key={i}
+                            label={`فائز ${i}`}
+                            subLabel={`ربع نهائي ${Math.ceil(i / 2)}`}
+                        />
+                    ))}
+                </div>
+                <div className="flex flex-col justify-around gap-32 mt-24">
+                    <div className="text-center font-bold text-blue-800 mb-4 bg-blue-100 py-1 rounded -mt-24">
+                        نصف النهائي
+                    </div>
+                    {[1, 2, 3, 4].map(i => (
+                        <BracketNode
+                            key={i}
+                            label={`فائز ربع ${i}`}
+                            subLabel={`نصف نهائي ${Math.ceil(i / 2)}`}
+                        />
+                    ))}
+                </div>
+                <div className="flex flex-col justify-center items-center gap-4">
+                    <div className="text-center font-bold text-yellow-700 mb-4 bg-yellow-100 py-1 rounded w-full">
+                        النهائي
+                    </div>
+                    <div className="border-l-2 h-16 border-gray-300"></div>
+                    <div className="p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg flex flex-col items-center">
+                        <Trophy size={48} className="text-yellow-500 mb-2" />
+                        <span className="font-bold text-yellow-800">بطل الكأس</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )}
+
+    {/* --- RIYADH SCHEDULE --- */}
+    {activeTab === 'riyadh-schedule' && (
+        <div className="max-w-5xl mx-auto space-y-6">
+            {/* موقع مباريات الرياض */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 text-white p-2 rounded-full">
+                        <MapPin size={24} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-blue-900">موقع مباريات الرياض</h3>
+                        <p className="text-sm text-blue-700">جميع المباريات تقام في هذا الموقع</p>
+                    </div>
+                </div>
+                <a 
+                    href="https://maps.app.goo.gl/ecqLTe7nvDhzFDcQ8?g_st=iw" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2"
+                >
+                    <span>الذهاب للموقع</span>
+                    <MapPin size={18} />
+                </a>
+            </div>
+
+            {riyadhSchedule.map((day, idx) => (
+                <div key={idx} className="bg-white rounded-lg shadow border overflow-hidden">
+                    <div className="bg-blue-600 text-white p-3 font-bold flex justify-between">
+                        <span>{day.day}</span>
+                        <Calendar size={18} />
+                    </div>
+                    <table className="w-full text-right text-sm">
+                        <thead className="bg-gray-50 text-gray-500">
+                            <tr>
+                                <th className="p-3">الوقت</th>
+                                <th className="p-3">الملعب A</th>
+                                <th className="p-3">الملعب B</th>
+                                <th className="p-3">الملعب C</th>
+                                <th className="p-3">الملعب D</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                            {day.matches.map((m, i) => (
+                                <tr key={i} className="hover:bg-gray-50">
+                                    <td className="p-3 font-mono">{m.time}</td>
+                                    <td className="p-3 font-bold">{m.pitchA || "—"}</td>
+                                    <td className="p-3 font-bold">{m.pitchB || "—"}</td>
+                                    <td className="p-3 font-bold">{m.pitchC || "—"}</td>
+                                    <td className="p-3 font-bold">{m.pitchD || "—"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            ))}
+        </div>
+    )}
+
+    {/* --- RULES PAGE --- */}
+    {activeTab === 'rules' && (
+        <div className="max-w-3xl mx-auto space-y-6">
+            <div className="bg-white rounded-xl shadow border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-blue-600 text-white p-2 rounded-full">
+                        <Shield size={24} />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800">نظام بطولة الموظفين</h2>
+                        <p className="text-sm text-gray-500">القواعد الأساسية للبطولة</p>
+                    </div>
+                </div>
+
+                <div className="space-y-4 text-sm leading-relaxed text-gray-800">
+                    <div className="border-b pb-3">
+                        <h3 className="font-bold text-blue-800 mb-1">مدة المباراة</h3>
+                        <p>زمن المباراة ٤٠ دقيقة، مقسّمة على شوطين، كل شوط ٢٠ دقيقة، مع راحة بين الشوطين مدتها ١٠ دقائق.</p>
+                    </div>
+
+                    <div className="border-b pb-3">
+                        <h3 className="font-bold text-blue-800 mb-1">عدد اللاعبين</h3>
+                        <p>اللعب بنظام <span className="font-semibold">٨ ضد ٨</span> داخل الملعب.</p>
+                    </div>
+
+                    <div className="border-b pb-3">
+                        <h3 className="font-bold text-blue-800 mb-1">التبديلات</h3>
+                        <p>التبديلات <span className="font-semibold">مفتوحة</span> طوال المباراة، وفق توجيهات الحكم ومنظم البطولة.</p>
+                    </div>
+
+                    <div className="border-b pb-3">
+                        <h3 className="font-bold text-blue-800 mb-1">الزي الرياضي</h3>
+                        <p>
+                            يجب الالتزام بالزي الرياضي المناسب، بما في ذلك
+                            <span className="font-semibold"> حذاء كرة القدم</span> المخصص للعب على العشب الصناعي أو نوعية أرضية الملعب المعتمدة.
+                        </p>
+                    </div>
+
+                    <div className="border-b pb-3">
+                        <h3 className="font-bold text-blue-800 mb-1">صديريات البطولة</h3>
+                        <p>
+                            ستتم توزيع صديريات خاصة بشعار
+                            <span className="font-semibold"> التعاونية </span>
+                            على الفرق قبل بداية المباراة، ويلتزم اللاعبون بارتدائها أثناء اللعب.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 className="font-bold text-blue-800 mb-1">نظام البطولة</h3>
+                        <p>
+                            البطولة تُقام بنظام
+                            <span className="font-semibold"> خروج المغلوب</span>، بحيث يتأهل الفائز من كل مباراة إلى الدور التالي حتى الوصول إلى النهائي.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )}
+</main>    
                 </div>
             );
         };
@@ -2248,6 +2289,7 @@ const jeddahData = {
     </script>
 </body>
 </html>
+
 
 
 
