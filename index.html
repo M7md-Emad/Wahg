@@ -1934,37 +1934,67 @@ const jeddahData = {
 };
 
 
-            const riyadhSchedule = [
-                { 
-                    day: "الثلاثاء 16/12 – دور الـ 16", 
-                    matches: [
-                        { time: "7:00 – 7:40", pitchA: "Health-1 vs Health-2", pitchB: "Health-3 vs Health-4" }, 
-                        { time: "7:50 – 8:30", pitchA: "Health-5 vs Tech-1", pitchB: "Tech-2 vs General" }, 
-                        { time: "8:40 – 9:20", pitchA: "Mobility vs CSM", pitchB: " ERO Qualifier vs CLC" }, 
-                        { time: "9:30 – 10:10", pitchA: " WRO Qualifier vs TSI", pitchB: "Finance vs GHC" }
-                    ] 
-                },
-                { 
-                    day: "الاربعاء 17/12 – ربع النهائي", 
-                    matches: [
-                        { time: "7:00 – 7:40", pitchA: "ربع نهائي 1", pitchB: "ربع نهائي 2" }, 
-                        { time: "7:50 – 8:30", pitchA: "ربع نهائي 3", pitchB: "ربع نهائي 4" }
-                    ] 
-                },
-                {
-                    day: "السبت 20/12 – نصف النهائي",
-                    matches: [
-                        { time: "7:00 – 7:40", pitchA: "نصف النهائي 1", pitchB: "—" },
-                        { time: "8:00 – 8:40", pitchA: "نصف النهائي 2", pitchB: "—" }
-                    ]
-                },
-                {
-                    day: "الاثنين 22/12 – النهائي",
-                    matches: [
-                        { time: "7:00 – 7:40", pitchA: "النهائي الكبير 🏆", pitchB: "—" }
-                    ]
-                }
-            ];
+           const riyadhSchedule = [
+    { 
+        day: "الثلاثاء 16/12 – دور الـ 16", 
+        matches: [
+            // الفترة الأولى: 6:00 – 7:00 (٤ ملاعب)
+            { 
+                time: "6:00 – 7:00", 
+                pitchA: "Health-1 vs Health-2", 
+                pitchB: "Health-3 vs Health-4",
+                pitchC: "Health-5 vs Tech-1",
+                pitchD: "Tech-2 vs General"
+            }, 
+            // الفترة الثانية: 7:00 – 8:00 (٤ ملاعب)
+            { 
+                time: "7:00 – 8:00", 
+                pitchA: "Mobility vs CSM", 
+                pitchB: "ERO Qualifier vs CLC",
+                pitchC: "WRO Qualifier vs TSI",
+                pitchD: "Finance vs GHC"
+            }
+        ] 
+    },
+    { 
+        day: "الأربعاء 17/12 – ربع النهائي", 
+        matches: [
+            // ٤ مباريات في ٤ ملاعب من 6:00 – 7:00
+            { 
+                time: "6:00 – 7:00", 
+                pitchA: "ربع نهائي 1", 
+                pitchB: "ربع نهائي 2",
+                pitchC: "ربع نهائي 3",
+                pitchD: "ربع نهائي 4"
+            }
+        ] 
+    },
+    {
+        day: "السبت 20/12 – نصف النهائي",
+        matches: [
+            // ملعبين من 8:00 – 9:00
+            { 
+                time: "8:00 – 9:00", 
+                pitchA: "نصف النهائي 1", 
+                pitchB: "نصف النهائي 2",
+                pitchC: "—",
+                pitchD: "—"
+            }
+        ]
+    },
+    {
+        day: "الاثنين 22/12 – النهائي",
+        matches: [
+            { 
+                time: "7:00 – 7:40", 
+                pitchA: "النهائي الكبير 🏆", 
+                pitchB: "—",
+                pitchC: "—",
+                pitchD: "—"
+            }
+        ]
+    }
+];
 
             return (
                 <div className="min-h-screen bg-gray-50 font-sans pb-12" dir="rtl">
@@ -2135,11 +2165,23 @@ const jeddahData = {
                                         </div>
                                         <table className="w-full text-right text-sm">
                                             <thead className="bg-gray-50 text-gray-500">
-                                                <tr><th className="p-3">الوقت</th><th className="p-3">الملعب A</th><th className="p-3">الملعب B</th></tr>
+                                                <tr>
+                                                    <th className="p-3">الوقت</th>
+                                                    <th className="p-3">الملعب A</th>
+                                                    <th className="p-3">الملعب B</th>
+                                                    <th className="p-3">الملعب C</th>
+                                                    <th className="p-3">الملعب D</th>
+                                                </tr>
                                             </thead>
                                             <tbody className="divide-y">
                                                 {day.matches.map((m, i) => (
-                                                    <tr key={i} className="hover:bg-gray-50"><td className="p-3 font-mono">{m.time}</td><td className="p-3 font-bold">{m.pitchA}</td><td className="p-3 font-bold">{m.pitchB}</td></tr>
+                                                    <tr key={i} className="hover:bg-gray-50">
+                                                        <td className="p-3 font-mono">{m.time}</td>
+                                                        <td className="p-3 font-bold">{m.pitchA || "—"}</td>
+                                                        <td className="p-3 font-bold">{m.pitchB || "—"}</td>
+                                                        <td className="p-3 font-bold">{m.pitchC || "—"}</td>
+                                                        <td className="p-3 font-bold">{m.pitchD || "—"}</td>
+                                                    </tr>
                                                 ))}
                                             </tbody>
                                         </table>
@@ -2157,6 +2199,7 @@ const jeddahData = {
     </script>
 </body>
 </html>
+
 
 
 
