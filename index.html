@@ -2223,7 +2223,7 @@ const jeddahData = {
                     <table className="w-full text-right text-sm">
                       <thead className="bg-gray-50 text-gray-500">
                         <tr>
-                          <th className="p-3">الوقت</th>  
+                          <th className="p-3">الوقت</th>
                           <th className="p-3">الملعب A</th>
                           <th className="p-3">الملعب B</th>
                           <th className="p-3">الملعب C</th>
@@ -2234,26 +2234,11 @@ const jeddahData = {
                       <tbody className="divide-y">
                         {day.matches.map((m, i) => (
                           <tr key={i} className="hover:bg-gray-50">
-                            <td className="p-3 align-top">
-                              <MatchCell match={m.pitchD} />
-                            </td>
-                    
-                            <td className="p-3 align-top">
-                              <MatchCell match={m.pitchC} />
-                            </td>
-                    
-                            <td className="p-3 align-top">
-                              <MatchCell match={m.pitchB} />
-                            </td>
-                    
-                            <td className="p-3 align-top">
-                              <MatchCell match={m.pitchA} />
-                            </td>
-                    
-                            {/* مهم جدًا: نخلي الوقت LTR عشان ما ينعكس */}
-                            <td className="p-3 font-mono align-top whitespace-nowrap" dir="ltr">
-                              {m.time}
-                            </td>
+                            <td className="p-3 font-mono align-top whitespace-nowrap" dir="ltr">{m.time}</td>
+                            <td className="p-3 align-top"><MatchCell match={m.pitchA} /></td>
+                            <td className="p-3 align-top"><MatchCell match={m.pitchB} /></td>
+                            <td className="p-3 align-top"><MatchCell match={m.pitchC} /></td>
+                            <td className="p-3 align-top"><MatchCell match={m.pitchD} /></td>
                           </tr>
                         ))}
                       </tbody>
@@ -2331,6 +2316,7 @@ const jeddahData = {
     </script>
 </body>
 </html>
+
 
 
 
