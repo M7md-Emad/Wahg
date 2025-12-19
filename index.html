@@ -1996,14 +1996,22 @@ const jeddahData = {
             const MatchCell = ({ match }) => {
   if (!match) return <span className="text-gray-400">—</span>;
 
+  // لو جاي نص (مثل: "ربع نهائي 1")
+  if (typeof match === "string") {
+    return <div className="font-bold text-gray-800">{match}</div>;
+  }
+
+  // لو جاي object (مثل دور الـ16 مع نتيجة)
   return (
     <div className="leading-tight">
       <div className="font-bold text-gray-800">{match.label}</div>
+
       {match.score && (
         <div className="mt-1 text-xs font-bold text-green-700 bg-green-50 inline-block px-2 py-0.5 rounded-full">
           {match.score}
         </div>
       )}
+
       {match.note && (
         <div className="mt-1 text-[11px] text-gray-500">
           {match.note}
@@ -2213,36 +2221,42 @@ const jeddahData = {
                         <Calendar size={18} />
                     </div>
                     <table className="w-full text-right text-sm">
-                        <thead className="bg-gray-50 text-gray-500">
-                            <tr>
-                                <th className="p-3">الوقت</th>
-                                <th className="p-3">الملعب A</th>
-                                <th className="p-3">الملعب B</th>
-                                <th className="p-3">الملعب C</th>
-                                <th className="p-3">الملعب D</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {day.matches.map((m, i) => (
-                                <tr key={i} className="hover:bg-gray-50">
-                                    <td className="p-3 align-top">
-                                      <MatchCell match={m.pitchA} />
-                                    </td>
-                                    <td className="p-3 align-top">
-                                      <MatchCell match={m.pitchB} />
-                                    </td>
-                                    <td className="p-3 align-top">
-                                      <MatchCell match={m.pitchC} />
-                                    </td>
-                                    <td className="p-3 align-top">
-                                      <MatchCell match={m.pitchD} />
-                                    </td>
-                                    <td className="p-3 font-mono align-top" dir="ltr">
-                                      {m.time}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
+                      <thead className="bg-gray-50 text-gray-500">
+                        <tr>
+                          <th className="p-3">الملعب D</th>
+                          <th className="p-3">الملعب C</th>
+                          <th className="p-3">الملعب B</th>
+                          <th className="p-3">الملعب A</th>
+                          <th className="p-3">الوقت</th>
+                        </tr>
+                      </thead>
+                    
+                      <tbody className="divide-y">
+                        {day.matches.map((m, i) => (
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="p-3 align-top">
+                              <MatchCell match={m.pitchD} />
+                            </td>
+                    
+                            <td className="p-3 align-top">
+                              <MatchCell match={m.pitchC} />
+                            </td>
+                    
+                            <td className="p-3 align-top">
+                              <MatchCell match={m.pitchB} />
+                            </td>
+                    
+                            <td className="p-3 align-top">
+                              <MatchCell match={m.pitchA} />
+                            </td>
+                    
+                            {/* مهم جدًا: نخلي الوقت LTR عشان ما ينعكس */}
+                            <td className="p-3 font-mono align-top whitespace-nowrap" dir="ltr">
+                              {m.time}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
                 </div>
             ))}
@@ -2317,6 +2331,7 @@ const jeddahData = {
     </script>
 </body>
 </html>
+
 
 
 
